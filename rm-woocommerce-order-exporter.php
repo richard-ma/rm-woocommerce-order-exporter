@@ -27,7 +27,11 @@ require_once( plugin_dir_path(__FILE__) . 'rm-woocommerce-order-exporter-excel.p
 
 // require js & css files
 function rmoe_admin_enqueue_scripts() {
-    wp_enqueue_script('ajax-download', plugins_url('js/ajax-download', __FILE__), array('jquery'), 20170807, true);
+    global $pagenow;
+
+    if ($pagenow == 'admin.php') {
+        wp_enqueue_script('ajax-download', plugins_url('js/ajax-download.js', __FILE__), array('jquery'), 20170807, true);
+    }
 }
 add_action('admin_enqueue_scripts', 'rmoe_admin_enqueue_scripts');
 
