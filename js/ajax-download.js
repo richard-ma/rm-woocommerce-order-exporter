@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
                 //security: RMOE.security
             },
             success: function(response) {
-                alert("response" + type + ' ' + postIds.val().toString());
+                alert("success");
             },
             error: function(error) {
                 alert("error");
