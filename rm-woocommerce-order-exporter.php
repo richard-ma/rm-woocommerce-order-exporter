@@ -22,8 +22,9 @@ if (!in_array( 'woocommerce/woocommerce.php', apply_filters('active_plugins', ge
 
 // require other php files
 require_once( plugin_dir_path(__FILE__) . 'rm-functions.php');
-require_once( plugin_dir_path(__FILE__) . 'rm-woocommerce-order-exporter-csv.php');
-require_once( plugin_dir_path(__FILE__) . 'rm-woocommerce-order-exporter-excel.php');
+require_once( plugin_dir_path(__FILE__) . 'rmoe-class-export.php');
+require_once( plugin_dir_path(__FILE__) . 'rmoe-class-csv-export.php');
+require_once( plugin_dir_path(__FILE__) . 'rmoe-class-excel-export.php');
 
 // require js & css files
 function rmoe_admin_enqueue_scripts() {
@@ -71,11 +72,19 @@ function rmoe_admin_exporter_submenu_callback() {
 <?php
 
     } else {
+        /*
+         * We need API like this
+         * $exporter = new RMOE_Export_Factory;
+         * $exporter->export($data);
+         */
+
+        /*
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment;filename="address-list-'.date('Y_m_d_H_i_s').'.csv"');
         header('Cache-Control: max-age=0');
         header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
         header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
         header ('Pragma: public'); // HTTP/1.0
+         */
     }
 }
