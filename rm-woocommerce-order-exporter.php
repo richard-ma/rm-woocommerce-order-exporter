@@ -52,20 +52,30 @@ add_action('admin_menu', 'rmoe_add_exporter_page_to_admin_submenu');
 
 // show order exporter form
 function rmoe_admin_exporter_submenu_callback() {
-    global $RMOE_EXPORTER_FORM;
-    echo file_get_contents($RMOE_EXPORTER_FORM);
+    if (empty($_POST)) {
+?>
+
+<h1>RM Woocommerce Order Exporter</h1>
+
+<form action="#" method="POST">
+<div>
+<textarea id='post_ids' name='post_ids' rows='10' cols='80'></textarea>
+</div>
+
+<div>
+<input id='export_csv' type="submit" value="Export CSV" />
+<input id='export_excel' type="submit" value="Export EXCEL" />
+</div>
+</form>
+
+<?php
+
+    } else {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment;filename="address-list-'.date('Y_m_d_H_i_s').'.csv"');
+        header('Cache-Control: max-age=0');
+        header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
+        header ('Pragma: public'); // HTTP/1.0
+    }
 }
-
-// ajax response
-function rmoe_export() {
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment;filename="address-list-'.date('Y_m_d_H_i_s').'.csv"');
-    header('Cache-Control: max-age=0');
-    header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-    header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
-    header ('Pragma: public'); // HTTP/1.0
-
-    echo 'hello';
-}
-
-add_action('wp_ajax_export', 'rmoe_export');
