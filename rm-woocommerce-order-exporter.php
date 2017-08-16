@@ -26,18 +26,6 @@ require_once( plugin_dir_path(__FILE__) . 'rmoe-class-export.php');
 require_once( plugin_dir_path(__FILE__) . 'rmoe-class-csv-export.php');
 require_once( plugin_dir_path(__FILE__) . 'rmoe-class-excel-export.php');
 
-// require js & css files
-function rmoe_admin_enqueue_scripts() {
-    global $pagenow;
-
-    if ($pagenow == 'admin.php') {
-        wp_enqueue_script('ajax-download', plugins_url('js/ajax-download.js', __FILE__), array('jquery'), 20170807, true);
-    }
-}
-add_action('admin_enqueue_scripts', 'rmoe_admin_enqueue_scripts');
-
-$RMOE_EXPORTER_FORM = plugin_dir_path(__FILE__) . 'rm-woocommerce-order-exporter-form.html';
-
 // add submenu export to woocommerce
 function rmoe_add_exporter_page_to_admin_submenu() {
     add_submenu_page(
@@ -52,8 +40,6 @@ function rmoe_add_exporter_page_to_admin_submenu() {
 add_action('admin_menu', 'rmoe_add_exporter_page_to_admin_submenu');
 
 function rmoe_admin_exporter_submenu_callback() {
-    if (empty($_POST)) {
-    // show order exporter form
 ?>
 
 <h1>RM Woocommerce Order Exporter</h1>
@@ -73,8 +59,11 @@ function rmoe_admin_exporter_submenu_callback() {
 </form>
 
 <?php
+}
 
-    } else {
+add_action('admin_init', 'rmoe_export');
+function rmoe_export() {
+    if ($_SERVER['REQUEST_URI'] == '/wp-admin/admin.php?page=rmoe_order_exporter' && !empty($_POST['order_ids'])) {
         // get form parameters
         $order_ids = rm_explode_ids(trim($_POST['order_ids']));
         $export_type = trim($_POST['export_type']);
@@ -83,6 +72,8 @@ function rmoe_admin_exporter_submenu_callback() {
         //var_dump($export_type);
 
         // get orders
+        $orders = array();
+
         foreach($order_ids as $key => $order_id) {
             $order = wc_get_order($order_id);
 
@@ -90,21 +81,37 @@ function rmoe_admin_exporter_submenu_callback() {
                 continue; // order id doesn't exsist.
             } else {
                 // get order data
-                $order = $order->get_data();
+                $order_data = $order->get_data();
                 //var_dump($order);
                 
                 $data = array(
                     'id' => $order_id,
-                    'name' => $order['shipping']['first_name'] . ' ' . $order['shipping']['last_name'],
-                    'address' => $order['shipping']['address_1'] . ' ' . $order['shipping']['address_2'],
-                    'city' => $order['shipping']['city'],
-                    'province' => $order['shipping']['state'],
-                    'post' => $order['shipping']['postcode'],
-                    'country' => $order['shipping']['country'],
-                    'tel' => $order['billing']['phone'],
+                    'name' => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
+                    'address' => $order_data['shipping']['address_1'] . ' ' . $order_data['shipping']['address_2'],
+                    'address_1' => $order_data['shipping']['address_1'],
+                    'address_2' => $order_data['shipping']['address_2'],
+                    'city' => $order_data['shipping']['city'],
+                    'province' => WC()->countries->states[$order_data['shipping']['country']][$order_data['shipping']['state']],
+                    'post' => $order_data['shipping']['postcode'],
+                    'country' => WC()->countries->countries[$order_data['shipping']['country']],
+                    'tel' => $order_data['billing']['phone'],
+                    'products' => array()
                 );
 
-                var_dump($data);
+                $products = $order->get_items();
+
+                foreach($products as $item) {
+                    $product = array(
+                        'name' => $item->get_product()->get_name(),
+                        'quantity' => $item->get_quantity(),
+                        'sku' => $item->get_product()->get_sku(),
+                        'image' => str_replace(get_site_url().'/', ABSPATH, wp_get_attachment_image_src(get_post_thumbnail_id($item->get_product()->get_id()))[0])
+                    );
+                    array_push($data['products'], $product);
+                }
+
+                //var_dump($data);
+                array_push($orders, $data);
             }
 
         }
@@ -113,16 +120,20 @@ function rmoe_admin_exporter_submenu_callback() {
         /*
          * We need API like this
          * $exporter = new RMOE_Export_Factory;
-         * $exporter->export($data);
+         * $exporter->export($orders);
          */
 
-        /*
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment;filename="address-list-'.date('Y_m_d_H_i_s').'.csv"');
-        header('Cache-Control: max-age=0');
-        header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-        header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
-        header ('Pragma: public'); // HTTP/1.0
-         */
+        $exporter = NULL;
+        if ($export_type == 'csv') {
+            // csv
+            $exporter = new RMOE_CsvExport;
+
+        } elseif ($export_type == 'excel') {
+            // excel
+            $exporter = new RMOE_ExcelExport;
+        }
+
+        $exporter->export($orders);
+        exit;
     }
 }
