@@ -51,27 +51,65 @@ function rmoe_add_exporter_page_to_admin_submenu() {
 }
 add_action('admin_menu', 'rmoe_add_exporter_page_to_admin_submenu');
 
-// show order exporter form
 function rmoe_admin_exporter_submenu_callback() {
     if (empty($_POST)) {
+    // show order exporter form
 ?>
 
 <h1>RM Woocommerce Order Exporter</h1>
 
 <form action="#" method="POST">
 <div>
-<textarea id='post_ids' name='post_ids' rows='10' cols='80'></textarea>
+<textarea id='order_ids' name='order_ids' rows='10' cols='80'></textarea>
 </div>
 
 <div>
-<input id='export_csv' type="submit" value="Export CSV" />
-<input id='export_excel' type="submit" value="Export EXCEL" />
+<span>TYPE: </span>
+<input id='export_csv' name="export_type" type="radio" value="csv" /><span>CSV</span>
+<input id='export_excel' name="export_type" type="radio" value="excel" /><span>EXCEL</span>
+<input id='submit_button' type="submit" value="Export" />
 </div>
+
 </form>
 
 <?php
 
     } else {
+        // get form parameters
+        $order_ids = rm_explode_ids(trim($_POST['order_ids']));
+        $export_type = trim($_POST['export_type']);
+
+        //var_dump($order_ids);
+        //var_dump($export_type);
+
+        // get orders
+        foreach($order_ids as $key => $order_id) {
+            $order = wc_get_order($order_id);
+
+            if (false === $order) {
+                continue; // order id doesn't exsist.
+            } else {
+                // get order data
+                $order = $order->get_data();
+                //var_dump($order);
+                
+                $data = array(
+                    'id' => $order_id,
+                    'name' => $order['shipping']['first_name'] . ' ' . $order['shipping']['last_name'],
+                    'address' => $order['shipping']['address_1'] . ' ' . $order['shipping']['address_2'],
+                    'city' => $order['shipping']['city'],
+                    'province' => $order['shipping']['state'],
+                    'post' => $order['shipping']['postcode'],
+                    'country' => $order['shipping']['country'],
+                    'tel' => $order['billing']['phone'],
+                );
+
+                var_dump($data);
+            }
+
+        }
+        
+        // export
         /*
          * We need API like this
          * $exporter = new RMOE_Export_Factory;
