@@ -14,8 +14,7 @@ class RMOE_ExcelExport extends RMOE_Export
         header('Content-Disposition: attachment;filename="order-'.date('Y_m_d_H_i_s').'.xlsx"'); // setting in subclass
     }
 	
-	public function get_product_type($name) {
-		$name = strtolower($name); // change $name to lowercase
+	public function get_product_type($size, $name) {
 		$keyword = array(
 			"man" => array(
 				"/\\sman('s)?(\\s)?/i", 
@@ -41,7 +40,27 @@ class RMOE_ExcelExport extends RMOE_Export
 				"/^newborn(\\s)?/i"),
 		);
 		//print_r($keyword);
+
 		$flg = Null;
+		$size = strtolower($size); // change $name to lowercase
+		foreach ($keyword as $key => $words) {
+			foreach ($words as $word) {
+				if (preg_match($word, $size) > 0) { // match!
+					$flg = $key;
+					break;
+				}
+			}
+		}
+		if ($flg == "man") {
+			return "男装";
+		} else if ($flg == "woman") {
+			return "女装";
+		} else if ($flg == "kid") {
+			return "童装";
+		}
+
+		$flg = Null;
+		$name = strtolower($name); // change $name to lowercase
 		foreach ($keyword as $key => $words) {
 			foreach ($words as $word) {
 				if (preg_match($word, $name) > 0) { // match!
@@ -93,7 +112,7 @@ class RMOE_ExcelExport extends RMOE_Export
     
                         ->setCellValue('B'.(string)($start).'', $product['name'])
                         //->setCellValue('B'.(string)($start+1).'', get_product_type($product['name']).' 数量: '.$product['quantity'].'; '.$options_str)
-                        ->setCellValue('B'.(string)($start+1).'', $this->get_product_type($product['name']).' 数量: '.$product['quantity'].'; ')
+                        ->setCellValue('B'.(string)($start+1).'', $this->get_product_type($product['size'], $product['name']).' 数量: '.$product['quantity'].'; '.'Size: '.$product['size'])
                         ->setCellValue('B'.(string)($start+2).'', $order['notes'])
                         ->mergeCells('B'.(string)($start+3).':B'.$end.'');
 						
