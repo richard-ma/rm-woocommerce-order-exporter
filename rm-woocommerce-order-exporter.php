@@ -138,10 +138,10 @@ function rmoe_export() {
                         'name' => $item->get_product()->get_name(),
                         'quantity' => $item->get_quantity(),
                         'sku' => $item->get_product()->get_sku(),
-                        'image' => str_replace(get_site_url().'/', ABSPATH, $item->get_product()->get_image_id()),
+                        'image' => str_replace(get_site_url().'/', ABSPATH, wp_get_attachment_image_url($item->get_product()->get_image_id(), 'full')),
 						'size' => $item->get_product()->get_attribute('size')
                     );
-					var_dump($product);
+					//var_dump($product);
                     array_push($data['products'], $product);
                 }
 
