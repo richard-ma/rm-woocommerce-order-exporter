@@ -46,6 +46,21 @@ function rmoe_admin_exporter_submenu_callback() {
 
 <form action="#" method="POST">
 <div>
+<span>Filter by Status: </span>
+<select id='status' name='status'>
+	<option value='textarea' selected>Filter by id</option>
+	<option value='pending'>Pending</option>
+	<option value='processing'>Processing</option>
+	<option value='on-hold'>On-Hold</option>
+	<option value='completed'>Completed</option>
+	<option value='cancelled'>Cancelled</option>
+	<option value='refunded'>Refunded</option>
+	<option value='failed'>Failed</option>
+	<option value='trash'>Trash</option>
+</select>
+</div>
+
+<div>
 <textarea id='order_ids' name='order_ids' rows='10' cols='80'></textarea>
 </div>
 
@@ -63,20 +78,34 @@ function rmoe_admin_exporter_submenu_callback() {
 
 add_action('admin_init', 'rmoe_export');
 function rmoe_export() {
-    if ($_SERVER['REQUEST_URI'] == '/wp-admin/admin.php?page=rmoe_order_exporter' && !empty($_POST['order_ids'])) {
-        // get form parameters
-        $order_ids = rm_explode_ids(trim($_POST['order_ids']));
-        $export_type = trim($_POST['export_type']);
+    if ($_SERVER['REQUEST_URI'] == '/wp-admin/admin.php?page=rmoe_order_exporter' && !empty($_POST['export_type']) && !empty($_POST['status'])) {
+		$export_type = trim($_POST['export_type']);
+		$orders = array();
 
-        //var_dump($order_ids);
-        //var_dump($export_type);
+		if ($_POST['status'] == 'textarea') {
+			// get form parameters
+			$order_ids = rm_explode_ids(trim($_POST['order_ids']));
 
-        // get orders
-        $orders = array();
+			//var_dump($order_ids);
 
-        foreach($order_ids as $key => $order_id) {
-            $order = wc_get_order($order_id);
+			foreach($order_ids as $key => $order_id) {
+				$order = wc_get_order($order_id);
+				array_push($orders, $order);
+			}
+		} else {
+			$status = "wc-" . trim($_POST['status']);
+			
+			//var_dump($status);
+			
+			$orders = wc_get_orders(array(
+				'status' => $status,
+			));
+		}
 
+		// get orders
+		$output_orders = array();
+		
+		foreach($orders as $key => $order) {
             if (false === $order) {
                 continue; // order id doesn't exsist.
             } else {
@@ -85,16 +114,20 @@ function rmoe_export() {
                 //var_dump($order);
                 
                 $data = array(
-                    'id' => $order_id,
+                    'id' => $order_data['id'],
                     'name' => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
                     'address' => $order_data['shipping']['address_1'] . ' ' . $order_data['shipping']['address_2'],
                     'address_1' => $order_data['shipping']['address_1'],
                     'address_2' => $order_data['shipping']['address_2'],
                     'city' => $order_data['shipping']['city'],
-                    'province' => WC()->countries->states[$order_data['shipping']['country']][$order_data['shipping']['state']],
+                    //'province' => WC()->countries->states[$order_data['shipping']['country']][$order_data['shipping']['state']],
+                    'province' => $order_data['shipping']['state'],
                     'post' => $order_data['shipping']['postcode'],
-                    'country' => WC()->countries->countries[$order_data['shipping']['country']],
+                    //'country' => WC()->countries->countries[$order_data['shipping']['country']],
+                    'country' => $order_data['shipping']['country'],
                     'tel' => $order_data['billing']['phone'],
+					'notes' => $order_data['customer_note'],
+					'shipping_method' => $order->get_shipping_method(),
                     'products' => array()
                 );
 
@@ -105,13 +138,15 @@ function rmoe_export() {
                         'name' => $item->get_product()->get_name(),
                         'quantity' => $item->get_quantity(),
                         'sku' => $item->get_product()->get_sku(),
-                        'image' => str_replace(get_site_url().'/', ABSPATH, wp_get_attachment_image_src(get_post_thumbnail_id($item->get_product()->get_id()))[0])
+                        'image' => str_replace(get_site_url().'/', ABSPATH, $item->get_product()->get_image_id()),
+						'size' => $item->get_product()->get_attribute('size')
                     );
+					var_dump($product);
                     array_push($data['products'], $product);
                 }
 
                 //var_dump($data);
-                array_push($orders, $data);
+                array_push($output_orders, $data);
             }
 
         }
@@ -133,7 +168,7 @@ function rmoe_export() {
             $exporter = new RMOE_ExcelExport;
         }
 
-        $exporter->export($orders);
+        $exporter->export($output_orders);
         exit;
     }
 }
