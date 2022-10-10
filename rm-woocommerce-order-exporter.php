@@ -116,7 +116,7 @@ function rmoe_export() {
                 $data = array(
                     'id' => $order_data['id'],
                     'name' => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
-                    'address' => $order_data['shipping']['address_1'] . ' ' . $order_data['shipping']['address_2'],
+                    'address' => $order_data['shipping']['address_1'] . ', ' . $order_data['shipping']['address_2'],
                     'address_1' => $order_data['shipping']['address_1'],
                     'address_2' => $order_data['shipping']['address_2'],
                     'city' => $order_data['shipping']['city'],
