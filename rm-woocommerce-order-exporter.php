@@ -114,7 +114,8 @@ function rmoe_export() {
                 //var_dump($order);
                 
                 $data = array(
-                    'id' => $order_data['id'],
+                    //'id' => $order_data['id'], // Update get order_id for Custom Order Numbers for WooCommerce plugin
+                    'id' => $order->get_order_number(),
                     'name' => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
                     'address' => $order_data['shipping']['address_1'] . ', ' . $order_data['shipping']['address_2'],
                     'address_1' => $order_data['shipping']['address_1'],
