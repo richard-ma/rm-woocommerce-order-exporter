@@ -112,7 +112,7 @@ class RMOE_ExcelExport extends RMOE_Export
     
                         ->setCellValue('B'.(string)($start).'', $product['name'])
                         //->setCellValue('B'.(string)($start+1).'', get_product_type($product['name']).' 数量: '.$product['quantity'].'; '.$options_str)
-                        ->setCellValue('B'.(string)($start+1).'', $this->get_product_type($product['size'], $product['name']).' 数量: '.$product['quantity'].'; '.'Size: '.$product['size'])
+                        ->setCellValue('B'.(string)($start+1).'', $this->get_product_type($product['size'], $product['name']).' 数量: '.$product['quantity'].'; '.'Size: '.$product['size'].'; '.'Name: '.$product['Input Name'].'; '.'Number: '.$product['Input Number'])
                         ->setCellValue('B'.(string)($start+2).'', $order['notes'])
                         ->mergeCells('B'.(string)($start+3).':B'.$end.'');
 						
