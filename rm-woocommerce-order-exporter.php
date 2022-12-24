@@ -114,8 +114,7 @@ function rmoe_export() {
                 //var_dump($order);
                 
                 $data = array(
-                    //'id' => $order_data['id'], // Update get order_id for Custom Order Numbers for WooCommerce plugin
-                    'id' => $order->get_order_number(),
+                    'id' => $order_data['id'],
                     'name' => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
                     'address' => $order_data['shipping']['address_1'] . ', ' . $order_data['shipping']['address_2'],
                     'address_1' => $order_data['shipping']['address_1'],
@@ -131,6 +130,10 @@ function rmoe_export() {
 					'shipping_method' => $order->get_shipping_method(),
                     'products' => array()
                 );
+                // Update get order_id for Custom Order Numbers for WooCommerce plugin
+                if (is_plugin_active("custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php")) {
+                    $data['id'] = $order->get_order_number();
+                }
 
                 $products = $order->get_items();
 
@@ -142,6 +145,11 @@ function rmoe_export() {
                         'image' => str_replace(get_site_url().'/', ABSPATH, wp_get_attachment_image_url($item->get_product()->get_image_id(), 'full')),
 						'size' => $item->get_product()->get_attribute('size')
                     );
+                    // wpc product options installed
+                    if (is_plugin_active("wpc-product-options-premium/wpc-product-options.php")) {
+                        $product['Input Name'] = $item->get_meta('Input Name');
+                        $product['Input Number'] = $item->get_meta('Input Number');
+                    }
 					//var_dump($product);
                     array_push($data['products'], $product);
                 }
