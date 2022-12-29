@@ -80,6 +80,20 @@ class RMOE_ExcelExport extends RMOE_Export
 		}
 	}
 
+	public function display_custom_property($product) {
+		$display_string = $this->get_product_type($product['size'], $product['name']).' 数量: '.$product['quantity'].'; '.'Size: '.$product['size'] ;
+
+		if (strlen($product['Input Name']) > 0) {
+			$display_string = $display_string . '; '.'Name: '.$product['Input Name'];
+		}
+
+		if (strlen($product['Input Number']) > 0) {
+			$display_string = $display_string . '; '.'Number: '.$product['Input Number'];
+		}
+
+		return $display_string;
+	}
+
     public function export($orders) {
         //Create new PHPExcel object
         $objPHPExcel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -112,7 +126,7 @@ class RMOE_ExcelExport extends RMOE_Export
     
                         ->setCellValue('B'.(string)($start).'', $product['name'])
                         //->setCellValue('B'.(string)($start+1).'', get_product_type($product['name']).' 数量: '.$product['quantity'].'; '.$options_str)
-                        ->setCellValue('B'.(string)($start+1).'', $this->get_product_type($product['size'], $product['name']).' 数量: '.$product['quantity'].'; '.'Size: '.$product['size'].'; '.'Name: '.$product['Input Name'].'; '.'Number: '.$product['Input Number'])
+                        ->setCellValue('B'.(string)($start+1).'', $this->display_custom_property($product))
                         ->setCellValue('B'.(string)($start+2).'', $order['notes'])
                         ->mergeCells('B'.(string)($start+3).':B'.$end.'');
 						
