@@ -25,11 +25,11 @@ function rm_explode_ids($ids_string) {
             if ($end < $start) list($start, $end) = array($end, $start);
             # push m-n items to result
             for ($i = $start; $i <= $end; $i++) {
-                array_push($orders, (int)$i);
+                array_push($orders, (string)$i);
             }
         } else {
             # process m format
-            array_push($orders, (int)$id);
+            array_push($orders, (string)$id);
         }
     }
 
