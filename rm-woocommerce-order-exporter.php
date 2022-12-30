@@ -88,10 +88,32 @@ function rmoe_export() {
 
 			//var_dump($order_ids);
 
-			foreach($order_ids as $key => $order_id) {
-				$order = wc_get_order($order_id);
-				array_push($orders, $order);
-			}
+            // Update get order_id for Custom Order Numbers for WooCommerce plugin
+            if (is_plugin_active("custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php")) {
+                $args = array(
+                    'post_type'      => 'shop_order',
+					'post_status'    => 'any',
+                    'meta_query'     => array(
+                        array(
+                            'key' => '_alg_wc_full_custom_order_number',
+                            'value' => $order_ids,
+                            'compare' => 'IN'
+                        ),
+                    )
+                );
+                $query = new WP_Query($args);
+                if ($query->have_posts()) {
+                    foreach($query->posts as $o) {
+				        $order = wc_get_order((int)$o->ID);
+				        array_push($orders, $order);
+                    }
+                }
+            } else {
+			    foreach($order_ids as $key => $order_id) {
+				    $order = wc_get_order((int)$order_id);
+				    array_push($orders, $order);
+			    }
+            }
 		} else {
 			$status = "wc-" . trim($_POST['status']);
 			
