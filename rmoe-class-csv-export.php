@@ -12,14 +12,14 @@ class RMOE_CsvExport extends RMOE_Export
         $output = "OrderNo, Name, Address, City, Province, Post, Country, Tel" . PHP_EOL;
 
         foreach($data as $item) {
-            $output .= rtrim($item['id'], ", ").',';
-            $output .= rtrim($item['name'], ", ").',';
-            $output .= rtrim($item['address'], ", ").',';
-            $output .= rtrim($item['city'], ", ").',';
-            $output .= rtrim($item['province'], ", ").',';
-            $output .= rtrim($item['post'], ", ").',';
-            $output .= rtrim($item['country'], ", ").',';
-            $output .= rtrim($item['tel'], ", ").',';
+            $output .= '"'.rtrim($item['id'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['name'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['address'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['city'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['province'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['post'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['country'], ", ").'"'.',';
+            $output .= '"'.rtrim($item['tel'], ", ").'"'.',';
             $output .= PHP_EOL;
         }
 
