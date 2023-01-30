@@ -1413,11 +1413,6 @@ class Worksheet implements IComparable
         return $this->rowDimensions[$row];
     }
 
-    public function rowDimensionExists(int $row): bool
-    {
-        return isset($this->rowDimensions[$row]);
-    }
-
     /**
      * Get column dimension at a specific column.
      *

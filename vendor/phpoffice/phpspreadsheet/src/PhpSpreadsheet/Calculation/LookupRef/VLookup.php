@@ -68,8 +68,8 @@ class VLookup extends LookupBase
     {
         reset($a);
         $firstColumn = key($a);
-        $aLower = StringHelper::strToLower((string) $a[$firstColumn]);
-        $bLower = StringHelper::strToLower((string) $b[$firstColumn]);
+        $aLower = StringHelper::strToLower($a[$firstColumn]);
+        $bLower = StringHelper::strToLower($b[$firstColumn]);
 
         if ($aLower == $bLower) {
             return 0;
@@ -84,7 +84,7 @@ class VLookup extends LookupBase
      */
     private static function vLookupSearch($lookupValue, array $lookupArray, $column, bool $notExactMatch): ?int
     {
-        $lookupLower = StringHelper::strToLower((string) $lookupValue);
+        $lookupLower = StringHelper::strToLower($lookupValue);
 
         $rowNumber = null;
         foreach ($lookupArray as $rowKey => $rowData) {

@@ -66,7 +66,7 @@ class HLookup extends LookupBase
      */
     private static function hLookupSearch($lookupValue, array $lookupArray, $column, bool $notExactMatch): ?int
     {
-        $lookupLower = StringHelper::strToLower((string) $lookupValue);
+        $lookupLower = StringHelper::strToLower($lookupValue);
 
         $rowNumber = null;
         foreach ($lookupArray[$column] as $rowKey => $rowData) {

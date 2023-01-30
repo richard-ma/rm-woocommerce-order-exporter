@@ -54,19 +54,6 @@ class Layout
     private $height;
 
     /**
-     * Position - t=top.
-     *
-     * @var string
-     */
-    private $dLblPos = '';
-
-    /** @var string */
-    private $numFmtCode = '';
-
-    /** @var bool */
-    private $numFmtLinked = false;
-
-    /**
      * show legend key
      * Specifies that legend keys should be shown in data labels.
      *
@@ -156,12 +143,6 @@ class Layout
         if (isset($layout['h'])) {
             $this->height = (float) $layout['h'];
         }
-        if (isset($layout['dLblPos'])) {
-            $this->dLblPos = (string) $layout['dLblPos'];
-        }
-        if (isset($layout['numFmtCode'])) {
-            $this->numFmtCode = (string) $layout['numFmtCode'];
-        }
         $this->initBoolean($layout, 'showLegendKey');
         $this->initBoolean($layout, 'showVal');
         $this->initBoolean($layout, 'showCatName');
@@ -169,7 +150,6 @@ class Layout
         $this->initBoolean($layout, 'showPercent');
         $this->initBoolean($layout, 'showBubbleSize');
         $this->initBoolean($layout, 'showLeaderLines');
-        $this->initBoolean($layout, 'numFmtLinked');
         $this->initColor($layout, 'labelFillColor');
         $this->initColor($layout, 'labelBorderColor');
         $this->initColor($layout, 'labelFontColor');
@@ -501,42 +481,6 @@ class Layout
     public function setLabelFontColor(?ChartColor $chartColor): self
     {
         $this->labelFontColor = $chartColor;
-
-        return $this;
-    }
-
-    public function getDLblPos(): string
-    {
-        return $this->dLblPos;
-    }
-
-    public function setDLblPos(string $dLblPos): self
-    {
-        $this->dLblPos = $dLblPos;
-
-        return $this;
-    }
-
-    public function getNumFmtCode(): string
-    {
-        return $this->numFmtCode;
-    }
-
-    public function setNumFmtCode(string $numFmtCode): self
-    {
-        $this->numFmtCode = $numFmtCode;
-
-        return $this;
-    }
-
-    public function getNumFmtLinked(): bool
-    {
-        return $this->numFmtLinked;
-    }
-
-    public function setNumFmtLinked(bool $numFmtLinked): self
-    {
-        $this->numFmtLinked = $numFmtLinked;
 
         return $this;
     }
