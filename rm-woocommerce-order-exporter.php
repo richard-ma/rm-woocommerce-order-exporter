@@ -120,6 +120,8 @@ function rmoe_export() {
 			//var_dump($status);
 			
 			$orders = wc_get_orders(array(
+				'limit'  => -1,
+				'type'      => 'shop_order',
 				'status' => $status,
 			));
 		}
